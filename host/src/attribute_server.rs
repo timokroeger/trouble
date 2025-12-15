@@ -158,9 +158,10 @@ impl<M: RawMutex, const CCCD_MAX: usize, const CONN_MAX: usize> CccdTables<M, CC
     fn disconnect(&self, peer_identity: &Identity) {
         self.state.lock(|n| {
             let mut n = n.borrow_mut();
-            for (client, _) in n.iter_mut() {
+            for (client, table) in n.iter_mut() {
                 if client.identity.match_identity(peer_identity) {
                     client.is_connected = false;
+                    table.disable_all();
                     break;
                 }
             }
