@@ -619,9 +619,7 @@ impl<M: RawMutex, const MAX: usize> Drop for ServiceBuilder<'_, '_, M, MAX> {
                 item.last_handle_in_group = last_handle;
             }
         });
-
-        // Jump to next 16-aligned
-        self.table.handle = self.table.handle + (0x10 - (self.table.handle % 0x10));
+        self.table.handle = last_handle + 1;
     }
 }
 
