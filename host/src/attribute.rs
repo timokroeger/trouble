@@ -68,7 +68,8 @@ impl<'a> Attribute<'a> {
     }
 }
 
-pub(crate) enum AttributeData<'d> {
+#[allow(missing_docs)]
+pub enum AttributeData<'d> {
     Service {
         uuid: Uuid,
     },
@@ -511,7 +512,8 @@ pub struct ServiceBuilder<'r, 'd, M: RawMutex, const MAX: usize> {
 }
 
 impl<'d, M: RawMutex, const MAX: usize> ServiceBuilder<'_, 'd, M, MAX> {
-    fn add_characteristic_internal<T: AsGatt>(
+    #[allow(missing_docs)]
+    pub fn add_characteristic_internal<T: AsGatt>(
         &mut self,
         uuid: Uuid,
         props: CharacteristicProps,
@@ -615,15 +617,12 @@ impl<'d, M: RawMutex, const MAX: usize> ServiceBuilder<'_, 'd, M, MAX> {
 
 impl<M: RawMutex, const MAX: usize> Drop for ServiceBuilder<'_, '_, M, MAX> {
     fn drop(&mut self) {
-        let last_handle = self.table.handle;
         self.table.with_inner(|inner| {
             for item in inner.attributes[self.start..].iter_mut() {
-                item.last_handle_in_group = last_handle;
+                item.last_handle_in_group = self.table.handle;
             }
         });
-
-        // Jump to next 16-aligned
-        self.table.handle = self.table.handle + (0x10 - (self.table.handle % 0x10));
+        self.table.handle += 1;
     }
 }
 
